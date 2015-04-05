@@ -64,8 +64,7 @@ public class ECUActivity extends android.support.v4.app.Fragment
 		{						
 			tvIAT.setText(String.valueOf(ecucomm.IAT)+"°");							
 			tvLoad.setText(String.valueOf(new DecimalFormat("#.##").format(ecucomm.Load)));							
-			tvKnock.setText(String.valueOf(ecucomm.FLKC));
-						
+			tvKnock.setText(String.valueOf(ecucomm.FLKC));					
 			
 			LoadGraph.addData(ecucomm.Load);			
 			FBKCGraph.addData(-ecucomm.FBKC);
