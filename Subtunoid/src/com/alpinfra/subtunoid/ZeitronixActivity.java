@@ -97,9 +97,9 @@ public class ZeitronixActivity extends android.support.v4.app.Fragment
 
 		
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.activityzeitronix, null);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
+	{
+		View view = inflater.inflate(R.layout.activityzeitronix, container, false);
 		
 		tvEGT = (TextView)view.findViewById(R.id.EGT);
 		tvAFR = (TextView)view.findViewById(R.id.AFR);

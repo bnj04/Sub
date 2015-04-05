@@ -74,6 +74,10 @@ public class ECUActivity extends android.support.v4.app.Fragment
 			{
 				FLKCGraph.addData(-ecucomm.FLKC);
 			}
+			else
+			{
+				FLKCGraph.addData(0);
+			}
 		}
 	};
 	
@@ -113,7 +117,7 @@ public class ECUActivity extends android.support.v4.app.Fragment
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 	{
-		View view = inflater.inflate(R.layout.activityecu, null);
+		View view = inflater.inflate(R.layout.activityecu, container, false);
 		tvIAT = (TextView)view.findViewById(R.id.IAT);		
 		tvLoad = (TextView)view.findViewById(R.id.LOAD);
 		tvKnock = (TextView)view.findViewById(R.id.Knock);

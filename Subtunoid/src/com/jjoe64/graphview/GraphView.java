@@ -23,6 +23,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -63,9 +64,10 @@ abstract public class GraphView extends LinearLayout {
 		/**
 		 * @param context
 		 */
-		public GraphViewContentView(Context context) {
+		public GraphViewContentView(Context context)
+		{
 			super(context);
-			setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+			setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		}
 
 		/**
@@ -183,6 +185,7 @@ abstract public class GraphView extends LinearLayout {
 		/**
 		 * @param event
 		 */
+		@SuppressLint("ClickableViewAccessibility")
 		@Override
 		public boolean onTouchEvent(MotionEvent event) {
 			if (!isScrollable() || isDisableTouch()) {
@@ -261,14 +264,16 @@ abstract public class GraphView extends LinearLayout {
 			super(context);
 			setLayoutParams(new LayoutParams(
 					getGraphViewStyle().getVerticalLabelsWidth()==0?100:getGraphViewStyle().getVerticalLabelsWidth()
-							, LayoutParams.FILL_PARENT));
+							, LayoutParams.MATCH_PARENT));
 		}
 
 		/**
 		 * @param canvas
 		 */
+		@SuppressLint("DrawAllocation")
 		@Override
-		protected void onDraw(Canvas canvas) {
+		protected void onDraw(Canvas canvas) 
+		{
 			// normal
 			paint.setStrokeWidth(0);
 
@@ -282,11 +287,9 @@ abstract public class GraphView extends LinearLayout {
 				verLabelTextWidth = (textBounds.width());
 			}
 			if (getGraphViewStyle().getVerticalLabelsWidth()==0 && getLayoutParams().width != verLabelTextWidth+GraphViewConfig.BORDER) {
-				setLayoutParams(new LayoutParams(
-						(int) (verLabelTextWidth+GraphViewConfig.BORDER), LayoutParams.FILL_PARENT));
+				setLayoutParams(new LayoutParams((int) (verLabelTextWidth+GraphViewConfig.BORDER), LayoutParams.MATCH_PARENT));
 			} else if (getGraphViewStyle().getVerticalLabelsWidth()!=0 && getGraphViewStyle().getVerticalLabelsWidth() != getLayoutParams().width) {
-				setLayoutParams(new LayoutParams(
-						getGraphViewStyle().getVerticalLabelsWidth(), LayoutParams.FILL_PARENT));
+				setLayoutParams(new LayoutParams(getGraphViewStyle().getVerticalLabelsWidth(), LayoutParams.MATCH_PARENT));
 			}
 
 			float border = GraphViewConfig.BORDER;
@@ -373,7 +376,7 @@ abstract public class GraphView extends LinearLayout {
 	 */
 	public GraphView(Context context, String title) {
 		super(context);
-		setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+		setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
 		if (title == null)
 			this.title = "";
@@ -389,7 +392,7 @@ abstract public class GraphView extends LinearLayout {
 		viewVerLabels = new VerLabelsView(context);
 		addView(viewVerLabels);
 		graphViewContentView = new GraphViewContentView(context);
-		addView(graphViewContentView, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 1));
+		addView(graphViewContentView, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, 1));
 	}
 
 	private GraphViewDataInterface[] _values(int idxSeries) {

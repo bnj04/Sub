@@ -85,10 +85,10 @@ public class BTCommZeitronix extends Activity
 						Boostv = asUnsignedInt(b.get(9)) * 256.0 + asUnsignedInt(b.get(8));
 						// conversion psi en bar
 						Boostv = Boostv * 0.0068947573;
-					}		        		        		       
-					_myHandler.post(_myRunnable);
+					}		        		        		       					
 				}
-				else
+				_myHandler.post(_myRunnable);
+				/*else
 				{
 					timerserial.purge();
 					timerserial.cancel();
@@ -99,7 +99,7 @@ public class BTCommZeitronix extends Activity
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}					
-				}
+				}*/
 			}			
 		};			
 	}
