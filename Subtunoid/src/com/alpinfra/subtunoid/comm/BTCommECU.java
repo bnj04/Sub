@@ -52,6 +52,7 @@ public class BTCommECU extends Activity
 	public double FBKC;
 	public double FLKC;
 	public double FLTO;
+	public double PreviousFLTO;
 	
 	public BTCommECU(Context context, Handler myHandler, Runnable myRunnable)
 	{
@@ -88,6 +89,7 @@ public class BTCommECU extends Activity
 				    	FBKC = 0;
 				    	FLKC = 0;
 				    }
+				    PreviousFLTO = FLTO;
 				    FLTO = b.get(12)+1;	
 				}															
 				_myHandler.post(_myRunnable);							

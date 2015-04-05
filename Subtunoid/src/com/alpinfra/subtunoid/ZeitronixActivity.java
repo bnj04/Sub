@@ -46,7 +46,7 @@ public class ZeitronixActivity extends android.support.v4.app.Fragment
 	{
 		public void run() 
 		{						
-			tvEGT.setText(String.valueOf(zeitronixcomm.EGTv));		        		       
+			tvEGT.setText(String.valueOf(zeitronixcomm.EGTv)+"°");		        		       
 			tvAFR.setText(String.valueOf(zeitronixcomm.AFRv));
 			tvBoost.setText(new DecimalFormat("#.##").format(zeitronixcomm.Boostv));	
 			

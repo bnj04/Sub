@@ -62,18 +62,18 @@ public class ECUActivity extends android.support.v4.app.Fragment
 	{
 		public void run() 
 		{						
-			tvIAT.setText(String.valueOf(ecucomm.IAT));		
-			
-			
-			tvLoad.setText(String.valueOf(new DecimalFormat("#.##").format(ecucomm.Load)));
-			
-			
-			
-			tvKnock.setText(String.valueOf(ecucomm.FLTO));
+			tvIAT.setText(String.valueOf(ecucomm.IAT)+"°");							
+			tvLoad.setText(String.valueOf(new DecimalFormat("#.##").format(ecucomm.Load)));							
+			tvKnock.setText(String.valueOf(ecucomm.FLKC));
+						
 			
 			LoadGraph.addData(ecucomm.Load);			
 			FBKCGraph.addData(-ecucomm.FBKC);
-			FLKCGraph.addData(-ecucomm.FLKC);		
+			
+			if (ecucomm.PreviousFLTO != ecucomm.FLTO)
+			{
+				FLKCGraph.addData(-ecucomm.FLKC);
+			}
 		}
 	};
 	
@@ -108,13 +108,10 @@ public class ECUActivity extends android.support.v4.app.Fragment
 		ecucomm.onPause();
 		super.onPause();	  	    	    	  
 	}
-
 	
-
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) 
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 	{
 		View view = inflater.inflate(R.layout.activityecu, null);
 		tvIAT = (TextView)view.findViewById(R.id.IAT);		

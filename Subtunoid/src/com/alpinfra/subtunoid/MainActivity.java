@@ -37,7 +37,7 @@ public class MainActivity extends FragmentActivity
 		ViewPager myPager = (ViewPager) findViewById(R.id.panelpager);
 		FragmentAdapter adapter = new FragmentAdapter(getSupportFragmentManager(), fragments);
 		myPager.setAdapter(adapter);
-		myPager.setCurrentItem(1);
+		//myPager.setCurrentItem(1);
 
 		myPager.setOnPageChangeListener(new OnPageChangeListener() 
 		{

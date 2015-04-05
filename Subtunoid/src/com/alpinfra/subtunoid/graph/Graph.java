@@ -5,9 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
-
 import com.alpinfra.subtunoid.R;
-import com.alpinfra.subtunoid.R.raw;
 import com.jjoe64.graphview.CustomLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.GraphViewSeries;
@@ -130,7 +128,7 @@ public class Graph
 	
 	private void playAlarm() 
 	 {
-		 /*MediaPlayer mp = MediaPlayer.create(_context, R.raw.error);
+		 MediaPlayer mp = MediaPlayer.create(_context, R.raw.error);
 		 mp.start();
 		 mp.setOnCompletionListener(new OnCompletionListener() 
 		 {
@@ -139,7 +137,7 @@ public class Graph
 			 {
 				 mp.release();
 			 }
-		 });*/
+		 });
 	 }
 	
 
