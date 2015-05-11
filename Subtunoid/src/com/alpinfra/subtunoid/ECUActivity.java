@@ -64,18 +64,19 @@ public class ECUActivity extends android.support.v4.app.Fragment
 		{						
 			tvIAT.setText(String.valueOf(ecucomm.IAT)+"°");							
 			tvLoad.setText(String.valueOf(new DecimalFormat("#.##").format(ecucomm.Load)));							
-			tvKnock.setText(String.valueOf(ecucomm.FLKC));					
+								
 			
 			LoadGraph.addData(ecucomm.Load);			
-			FBKCGraph.addData(-ecucomm.FBKC);
+			FBKCGraph.addData(-ecucomm.FBKC);			
+			FLKCGraph.addData(-ecucomm.FLKC);
 			
 			if (ecucomm.PreviousFLTO != ecucomm.FLTO)
 			{
-				FLKCGraph.addData(-ecucomm.FLKC);
+				tvKnock.setText(String.valueOf(new DecimalFormat("#.##").format(ecucomm.FLKC)));
 			}
 			else
 			{
-				FLKCGraph.addData(0);
+				tvKnock.setText(String.valueOf(0));
 			}
 		}
 	};
@@ -92,8 +93,8 @@ public class ECUActivity extends android.support.v4.app.Fragment
 		
 		// Graph	    	   
 		LoadGraph = new Graph(activity, "Load", 0, 2.8, 2.45, 2.5);	   
-		FBKCGraph = new Graph(activity, "FBKC", 0, 2.46, 0.50, 2);	   	   
-		FLKCGraph = new Graph(activity, "FLKC", 0, 2.46, 0.50, 2);
+		FBKCGraph = new Graph(activity, "FBKC", 0, 2.46, 2.10, 2.15);	   	   
+		FLKCGraph = new Graph(activity, "FLKC", 0, 2.46, 2.10, 2.15);
 
 		Log.d(TAG, "...onCreate");
 	}

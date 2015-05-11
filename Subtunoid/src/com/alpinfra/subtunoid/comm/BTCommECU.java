@@ -15,7 +15,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
-import android.content.Intent;
+//import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
@@ -103,7 +103,7 @@ public class BTCommECU extends Activity
 
 	    Log.d(TAG, "...onResumeECU - try connect...");
 	    
-	    checkBTState();
+	    //checkBTState();
 	    
 	    // Set up a pointer to the remote node using it's address.
 	    BluetoothDevice device = btAdapter.getRemoteDevice(addressBTECU);
@@ -188,7 +188,7 @@ public class BTCommECU extends Activity
 	    
 	}
 	
-	private void checkBTState() 
+	/*private void checkBTState() 
 	{
 		// Check for Bluetooth support and then check to make sure it is turned on
 		// Emulator doesn't support Bluetooth and will return null
@@ -211,7 +211,7 @@ public class BTCommECU extends Activity
 				//startActivityForResult(enableBtIntent, 1);
 			}
 		}
-	}
+	}*/
 	
 	private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException 
 	  {

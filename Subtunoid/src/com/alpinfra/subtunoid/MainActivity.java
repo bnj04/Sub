@@ -2,6 +2,9 @@ package com.alpinfra.subtunoid;
 
 
 import java.util.Vector;
+
+import android.bluetooth.BluetoothAdapter;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -68,8 +71,17 @@ public class MainActivity extends FragmentActivity
 	@Override
 	public void onResume() 
 	{
-		super.onResume();	    
-		//btcZ.onResume();
+		super.onResume();	
+					
+		if (BluetoothAdapter.getDefaultAdapter().isEnabled()) 			
+		{
+			Log.d(TAG, "...Bluetooth ON...");
+		} 
+		else 
+		{
+			Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			startActivityForResult(enableBtIntent, 1);
+		}
 		
 	}
 

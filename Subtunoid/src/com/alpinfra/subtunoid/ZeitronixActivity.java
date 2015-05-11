@@ -65,19 +65,15 @@ public class ZeitronixActivity extends android.support.v4.app.Fragment
 		super.onCreate(savedInstanceState);
 		activity = getActivity();
 		//setContentView(R.layout.activity_main);
-
 		 
-
 		// Communication
 		zeitronixcomm = new BTCommZeitronix(activity,myHandler,myRunnable);
 
 		// Graph	    	   
-		EGTGraph = new Graph(activity, "EGT", 200, 900, 750, 800);	   
+		EGTGraph = new Graph(activity, "EGT", 200, 900, 800, 850);	   
 		AFRGraph = new Graph(activity, "AFR", 9, 16, 0, 0);	   	   
 		BoostGraph = new Graph(activity, "Boost", 0, 1.4, 1.25, 1.3);
-
 		
-
 		Log.d(TAG, "...onCreate");
 	}
 
