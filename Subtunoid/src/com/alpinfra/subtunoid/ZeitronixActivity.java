@@ -23,7 +23,7 @@ public class ZeitronixActivity extends android.support.v4.app.Fragment
 	private static final String TAG = "Subtunoid-Zeitronix";
 
 	// Communication bluetooth
-	BTCommZeitronix zeitronixcomm;
+	public BTCommZeitronix zeitronixcomm;
 	
 
 	// TextView

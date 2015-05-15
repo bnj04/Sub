@@ -23,7 +23,7 @@ public class ECUActivity extends android.support.v4.app.Fragment
 	private static final String TAG = "Subtunoid-ECU";
 
 	// Communication bluetooth	
-	BTCommECU ecucomm;
+	public BTCommECU ecucomm;
 
 	// TextView
 	TextView tvIAT;
@@ -38,7 +38,7 @@ public class ECUActivity extends android.support.v4.app.Fragment
 		
 	public ECUActivity() 
 	{
-	}
+	}	
 	
 	@Override
 	public void onDetach() {
@@ -54,6 +54,7 @@ public class ECUActivity extends android.support.v4.app.Fragment
 		super.onDestroyView();
 	}
 	
+  
 	
 
 	// Update GUI
@@ -72,7 +73,7 @@ public class ECUActivity extends android.support.v4.app.Fragment
 			
 			if (ecucomm.PreviousFLTO != ecucomm.FLTO)
 			{
-				tvKnock.setText(String.valueOf(new DecimalFormat("#.##").format(ecucomm.FLKC)));
+				tvKnock.setText(String.valueOf(new DecimalFormat("#.##").format(ecucomm.FLKC)));				
 			}
 			else
 			{

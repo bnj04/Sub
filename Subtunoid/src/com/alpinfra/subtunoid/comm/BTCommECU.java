@@ -4,12 +4,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -20,6 +23,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
+
 
 public class BTCommECU extends Activity 
 {
@@ -35,6 +39,9 @@ public class BTCommECU extends Activity
 	private Handler _myHandler;	  		  		 
 	private Runnable _myRunnable;
 	
+	
+	private KnockEvent ke;
+	private SimpleDateFormat sdf;
 	
 	// BT
 	private BluetoothAdapter btAdapter = null;
@@ -53,9 +60,14 @@ public class BTCommECU extends Activity
 	public double FLKC;
 	public double FLTO;
 	public double PreviousFLTO;
+	public double PreviousFLKC;
+	public double PreviousFBKC;
 	
+	@SuppressLint("SimpleDateFormat")
 	public BTCommECU(Context context, Handler myHandler, Runnable myRunnable)
 	{
+		ke = new KnockEvent();
+		sdf = new SimpleDateFormat("yyyyMMdd;HH-mm-ss");
 		
 		_context = context;
 		_myHandler = myHandler;
@@ -79,8 +91,12 @@ public class BTCommECU extends Activity
 					IAT = b.get(7) - 40;					
 					Load = (b.get(9) + b.get(8) * 0xff) * .00006103515625;				    				  
 				    
-				    if (Load > 0.7)
-				    {
+					PreviousFBKC = FBKC;
+			    	PreviousFLKC = FLKC;
+			    	PreviousFLTO = FLTO;
+					
+				    if (Load > 0.8)
+				    {				    	
 				    	FBKC = b.get(10)*.3515625 - 45;
 					    FLKC = b.get(11)*.3515625 - 45;				    					    	
 				    }
@@ -89,7 +105,26 @@ public class BTCommECU extends Activity
 				    	FBKC = 0;
 				    	FLKC = 0;
 				    }
-				    PreviousFLTO = FLTO;
+				    
+				    if (FBKC < PreviousFBKC - 2.10)
+				    {
+				    					    		   	
+				    	ke.time = sdf.format(new Date());	
+				    	ke.type = "FBKC";
+				    	ke.rpm = RPM;
+				    	ke.value = FBKC;
+				    	ke.load = Load;
+				    }
+				    
+				    if (FLKC < PreviousFLKC - 2.10)
+				    {
+				    	ke.time = sdf.format(new Date());	
+				    	ke.type = "FLKC";
+				    	ke.rpm = RPM;
+				    	ke.value = FBKC;
+				    	ke.load = Load;
+				    }
+				    
 				    FLTO = b.get(12)+1;	
 				}															
 				_myHandler.post(_myRunnable);							
@@ -234,6 +269,13 @@ public class BTCommECU extends Activity
 		    Toast.makeText(_context, title + " - " + message, Toast.LENGTH_LONG).show();
 		    finish();
 	 }	
+	
+	public KnockEvent getlastknockevent()
+	{
+		
+		return ke;
+		
+	}
 	
 	public void sendData() 
 	{
