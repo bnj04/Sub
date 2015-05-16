@@ -87,7 +87,7 @@ public class BTCommECU extends Activity
 				List<Integer> b = readdata(inStream); 				
 				if (b != null)
 				{
-					RPM = b.get(6) + b.get(5) * 0xff;
+					RPM = (b.get(6) + b.get(5) * 0xff) / 4 ;
 					IAT = b.get(7) - 40;					
 					Load = (b.get(9) + b.get(8) * 0xff) * .00006103515625;				    				  
 				    
@@ -121,7 +121,7 @@ public class BTCommECU extends Activity
 				    	ke.time = sdf.format(new Date());	
 				    	ke.type = "FLKC";
 				    	ke.rpm = RPM;
-				    	ke.value = FBKC;
+				    	ke.value = FLKC;
 				    	ke.load = Load;
 				    }
 				    

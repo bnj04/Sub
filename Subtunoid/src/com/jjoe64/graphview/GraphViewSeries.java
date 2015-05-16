@@ -203,4 +203,30 @@ public class GraphViewSeries {
             }
         }
     }
+    
+    public double getMaxY()
+    {
+    	double max = Double.MIN_VALUE;
+    	for (int i=0;i<values.length;i++)
+    	{
+    		if (values[i].getY() > max)
+    		{
+    			max = values[i].getY();
+    		}
+    	}
+    	return max;
+    }
+    
+    public double getMinY()
+    {
+    	double min = Double.MAX_VALUE;
+    	for (int i=0;i<values.length;i++)
+    	{
+    		if (values[i].getY() < min)
+    		{
+    			min = values[i].getY();
+    		}
+    	}
+    	return min;
+    }
 }

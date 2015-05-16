@@ -8,6 +8,7 @@ import com.alpinfra.subtunoid.graph.Graph;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,26 +66,16 @@ public class ECUActivity extends android.support.v4.app.Fragment
 		{						
 			tvIAT.setText(String.valueOf(ecucomm.IAT)+"°");							
 			tvLoad.setText(String.valueOf(new DecimalFormat("#.##").format(ecucomm.Load)));							
-								
+			tvKnock.setText(String.valueOf(new DecimalFormat("####").format(ecucomm.RPM)));
 			
-			LoadGraph.addData(ecucomm.Load);			
-			FBKCGraph.addData(-ecucomm.FBKC);			
-			FLKCGraph.addData(-ecucomm.FLKC);
+			ViewPager myPager = (ViewPager) activity.findViewById(R.id.panelpager);
 			
-			if (ecucomm.PreviousFLTO != ecucomm.FLTO)
-			{
-				tvKnock.setText(String.valueOf(new DecimalFormat("#.##").format(ecucomm.FLKC)));				
-			}
-			else
-			{
-				tvKnock.setText(String.valueOf(0));
-			}
+			if (LoadGraph.addData(ecucomm.Load)) myPager.setCurrentItem(1);
+			if (FBKCGraph.addData(-ecucomm.FBKC)) myPager.setCurrentItem(1);
+			if (FLKCGraph.addData(-ecucomm.FLKC)) myPager.setCurrentItem(1);																				
 		}
 	};
-	
-	
-	
-
+		
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
 	{

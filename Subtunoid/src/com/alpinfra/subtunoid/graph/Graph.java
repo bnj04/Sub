@@ -5,6 +5,8 @@ import android.content.Context;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.support.v4.view.ViewPager;
+
 import com.alpinfra.subtunoid.R;
 import com.jjoe64.graphview.CustomLabelFormatter;
 import com.jjoe64.graphview.GraphView;
@@ -16,8 +18,8 @@ import com.jjoe64.graphview.GraphViewStyle.GridStyle;
 
 public class Graph 
 {
-	GraphViewSeries _graphViewSeries;
-	GraphViewSeriesStyle _graphViewSeriesStyle;
+	public GraphViewSeries _graphViewSeries;
+	private GraphViewSeriesStyle _graphViewSeriesStyle;
 	public GraphView _graphView;
 	private int x=1;
 	private int xwe;
@@ -102,9 +104,9 @@ public class Graph
 		 
 	}
 	
-	public void addData(double v)
+	public boolean addData(double v)
 	{
-		_graphViewSeries.appendData(new GraphViewData(++x, v),true,50);
+		_graphViewSeries.appendData(new GraphViewData(++x, v),true,50);		
 		if (enableAlarm)
 		{
 			if (v > _error) 
@@ -112,23 +114,27 @@ public class Graph
 				_graphViewSeriesStyle.color = Color.RED;
 				playAlarm();
 				xwe = x;
+				return true;
 			}
 			else if (v > _warning) 
 			{
 				_graphViewSeriesStyle.color = Color.rgb(255, 128, 0); //Orange
 				playAlarm();
 				xwe = x;
+				return true;
 			}
 			else if (x > xwe + AlarmDuration)
 			{
 				_graphViewSeriesStyle.color = Color.BLUE;
 			}
 		}
+		return false;
 	}
 	
 	private void playAlarm() 
-	 {
-		 MediaPlayer mp = MediaPlayer.create(_context, R.raw.error);
+	 {		 
+		
+		MediaPlayer mp = MediaPlayer.create(_context, R.raw.error);
 		 mp.start();
 		 mp.setOnCompletionListener(new OnCompletionListener() 
 		 {

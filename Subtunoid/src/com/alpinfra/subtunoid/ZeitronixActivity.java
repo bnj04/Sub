@@ -7,6 +7,7 @@ import com.alpinfra.subtunoid.graph.Graph;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,15 +47,23 @@ public class ZeitronixActivity extends android.support.v4.app.Fragment
 	{
 		public void run() 
 		{						
-			tvEGT.setText(String.valueOf(zeitronixcomm.EGTv)+"°");		        		       
-			tvAFR.setText(String.valueOf(zeitronixcomm.AFRv));
-			tvBoost.setText(new DecimalFormat("#.##").format(zeitronixcomm.Boostv));	
+			//tvEGT.setText(String.valueOf(zeitronixcomm.EGTv)+"°");		        
+			tvEGT.setText(String.valueOf(EGTGraph._graphViewSeries.getMaxY())+"°");		
 			
-		
+			//tvAFR.setText(String.valueOf(zeitronixcomm.AFRv));
+			tvAFR.setText(String.valueOf(AFRGraph._graphViewSeries.getMinY()));
 			
-			EGTGraph.addData(zeitronixcomm.EGTv);		       
-			AFRGraph.addData(zeitronixcomm.AFRv);
-			BoostGraph.addData(zeitronixcomm.Boostv);		       
+			//tvBoost.setText(new DecimalFormat("#.##").format(zeitronixcomm.Boostv));	
+			tvBoost.setText(new DecimalFormat("#.##").format(BoostGraph._graphViewSeries.getMaxY()));
+							
+			ViewPager myPager = (ViewPager) activity.findViewById(R.id.panelpager);		
+			
+			if (EGTGraph.addData(zeitronixcomm.EGTv)) myPager.setCurrentItem(0);	       
+			if (AFRGraph.addData(zeitronixcomm.AFRv)) myPager.setCurrentItem(0);
+			if (BoostGraph.addData(zeitronixcomm.Boostv)) myPager.setCurrentItem(0);	
+			
+				
+			
 		}
 	};		
 

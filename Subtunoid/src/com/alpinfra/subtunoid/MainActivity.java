@@ -5,8 +5,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.text.DecimalFormat;
 import java.util.Vector;
 
 import com.alpinfra.subtunoid.comm.KnockEvent;
@@ -181,20 +180,25 @@ public class MainActivity extends FragmentActivity
 		
 		KnockEvent ke = ecuact.ecucomm.getlastknockevent();
 		
-		Toast.makeText(MainActivity.this,"Saving knock event...", Toast.LENGTH_LONG).show();
-		try
+		if (ke.time != null)
 		{
-			File logFile = new File(((Context)this).getExternalFilesDir(null), "sublog.txt");
-			if (!logFile.exists()) logFile.createNewFile();
-			BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true /*append*/));
-
-			writer.write(ke.time + ";"+ke.type+";"+ke.rpm+";"+ke.load+";"+ke.value+"\r\n");
-			writer.close();
+			Toast.makeText(MainActivity.this,"Saving knock event...", Toast.LENGTH_LONG).show();
+			try
+			{
+				File logFile = new File(((Context)this).getExternalFilesDir(null), "sublog.txt");
+				if (!logFile.exists()) logFile.createNewFile();
+				BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true /*append*/));
+							
+				writer.write(ke.time + ";"+ke.type+";"+String.valueOf(new DecimalFormat("####").format(ke.rpm))+";"+String.valueOf(new DecimalFormat("#.##").format(ke.load))+";"+String.valueOf(new DecimalFormat("#.##").format(ke.value))+"\r\n");
+				writer.close();
+				ke.time = null;
+			}
+			catch (IOException e)
+			{
+				Log.e(TAG, "Unable to write to the LogFile.");
+			}
 		}
-		catch (IOException e)
-		{
-			Log.e(TAG, "Unable to write to the LogFile.");
-		}
+		
 						
 	}
 }
