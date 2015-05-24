@@ -12,6 +12,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 
+import com.alpinfra.subtunoid.MainActivity;
+import com.alpinfra.subtunoid.ZeitronixActivity;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -67,7 +70,8 @@ public class BTCommECU extends Activity
 	public BTCommECU(Context context, Handler myHandler, Runnable myRunnable)
 	{
 		ke = new KnockEvent();
-		sdf = new SimpleDateFormat("yyyyMMdd;HH-mm-ss");
+		sdf = new SimpleDateFormat("yyyyMMdd;HH:mm:ss");
+		
 		
 		_context = context;
 		_myHandler = myHandler;
@@ -78,22 +82,37 @@ public class BTCommECU extends Activity
 		//checkBTState();
 		
 		timerserial = new Timer(); 
+		
 		tt = new TimerTask() 
 		{			
 			@Override
 			public void run() 
 			{	    	
+				Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+				MainActivity ma;
+				ZeitronixActivity zeintronixact;										
+				
 				sendData();
+				
+				ma = (MainActivity) _context;
+				zeintronixact = (ZeitronixActivity) ma.fragments.get(0);
+			    ke.afr = zeintronixact.zeitronixcomm.AFRv;
+														
 				List<Integer> b = readdata(inStream); 				
 				if (b != null)
 				{
+					// debug
+					
+					
+					
 					RPM = (b.get(6) + b.get(5) * 0xff) / 4 ;
 					IAT = b.get(7) - 40;					
 					Load = (b.get(9) + b.get(8) * 0xff) * .00006103515625;				    				  
 				    
 					PreviousFBKC = FBKC;
 			    	PreviousFLKC = FLKC;
-			    	PreviousFLTO = FLTO;
+			    	PreviousFLTO = FLTO;			    	
+			    	FLTO = b.get(12)+1;	
 					
 				    if (Load > 0.8)
 				    {				    	
@@ -114,20 +133,30 @@ public class BTCommECU extends Activity
 				    	ke.rpm = RPM;
 				    	ke.value = FBKC;
 				    	ke.load = Load;
+				    	ma = (MainActivity) _context;
+				    	zeintronixact = (ZeitronixActivity) ma.fragments.get(0);
+				    	ke.afr = zeintronixact.zeitronixcomm.AFRv;
 				    }
 				    
-				    if (FLKC < PreviousFLKC - 2.10)
+				    // /!\ FLTO
+				    if ((FLKC < PreviousFLKC - 2.10) && (PreviousFLTO == FLTO))
 				    {
 				    	ke.time = sdf.format(new Date());	
 				    	ke.type = "FLKC";
 				    	ke.rpm = RPM;
 				    	ke.value = FLKC;
-				    	ke.load = Load;
-				    }
-				    
-				    FLTO = b.get(12)+1;	
-				}															
-				_myHandler.post(_myRunnable);							
+				    	ke.load = Load;		
+				    	ma = (MainActivity) _context;
+				    	zeintronixact = (ZeitronixActivity) ma.fragments.get(0);
+				    	ke.afr = zeintronixact.zeitronixcomm.AFRv;
+				    }				    				  				 
+				}
+				else
+				{
+					IAT = 0;
+				}
+				_myHandler.post(_myRunnable);	
+				
 			}			
 		};			
 	}
@@ -176,7 +205,9 @@ public class BTCommECU extends Activity
 		      outStream = btSocket.getOutputStream();
 		      inStream = btSocket.getInputStream();
 		      Log.d(TAG, "...lancement du timerECU...");
-		      timerserial.scheduleAtFixedRate(tt, 150, 150);
+		      timerserial.scheduleAtFixedRate(tt, 100, 150);
+		      //timerserial.schedule(tt, 0);
+		      //tt.run();
 		    } 
 		    catch (IOException e) 
 		    {
@@ -331,7 +362,7 @@ public class BTCommECU extends Activity
 	    	{
 	    		outStream.write(i);
 	    	}	         
-	        outStream.flush();
+	        outStream.flush();	        
 	         
 	    } 
 	    catch (IOException e) 
@@ -347,13 +378,28 @@ public class BTCommECU extends Activity
 		List<Integer> buffer = new ArrayList<Integer>(responseSize);
 		boolean stop = false;
 		boolean packetStarted = false;
+		
+		try {
+			if (is.available() >= 44)
+			{
+				Log.d(TAG, "...sup..."+is.available());
+			}
+			else
+			{
+				Log.d(TAG, "...not sup..."+is.available());
+			}
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
+		
 		try 
 		{
 			while ((!stop ) && (is.available()>responseSize))
-				
+			//long startTime = System.currentTimeMillis();
+			//while ((!stop) && (System.currentTimeMillis()-startTime<15))				
 			{
-
 				byte[] ba = new byte[1];
 				is.read(ba);
 				int b = ba[0] & 0xff;
@@ -400,7 +446,7 @@ public class BTCommECU extends Activity
 		{
 			if (calculcrc(buffer) == buffer.get(buffer.get(3)+4))
 			{			
-				Log.d(TAG, "...CRC OK...");
+				//Log.d(TAG, "...CRC OK...");
 			}
 			else
 			{
@@ -410,6 +456,7 @@ public class BTCommECU extends Activity
 		}
 		catch (Exception e)
 		{
+			//e.printStackTrace();
 			Log.d(TAG, "==>...Bad CRC...");
 			buffer = null;
 		}

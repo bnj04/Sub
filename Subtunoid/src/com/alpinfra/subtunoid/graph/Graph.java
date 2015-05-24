@@ -5,8 +5,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
-import android.support.v4.view.ViewPager;
-
 import com.alpinfra.subtunoid.R;
 import com.jjoe64.graphview.CustomLabelFormatter;
 import com.jjoe64.graphview.GraphView;

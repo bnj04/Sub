@@ -64,9 +64,9 @@ public class ECUActivity extends android.support.v4.app.Fragment
 	{
 		public void run() 
 		{						
-			tvIAT.setText(String.valueOf(ecucomm.IAT)+"°");							
+			tvIAT.setText(String.valueOf(ecucomm.IAT)+"°");					
 			tvLoad.setText(String.valueOf(new DecimalFormat("#.##").format(ecucomm.Load)));							
-			tvKnock.setText(String.valueOf(new DecimalFormat("####").format(ecucomm.RPM)));
+			tvKnock.setText(String.valueOf(new DecimalFormat("#.##").format(LoadGraph._graphViewSeries.getMaxY())));
 			
 			ViewPager myPager = (ViewPager) activity.findViewById(R.id.panelpager);
 			

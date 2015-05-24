@@ -48,10 +48,10 @@ public class ZeitronixActivity extends android.support.v4.app.Fragment
 		public void run() 
 		{						
 			//tvEGT.setText(String.valueOf(zeitronixcomm.EGTv)+"°");		        
-			tvEGT.setText(String.valueOf(EGTGraph._graphViewSeries.getMaxY())+"°");		
+			tvEGT.setText(String.valueOf(new DecimalFormat("###").format(EGTGraph._graphViewSeries.getMaxY()))+"°");		
 			
 			//tvAFR.setText(String.valueOf(zeitronixcomm.AFRv));
-			tvAFR.setText(String.valueOf(AFRGraph._graphViewSeries.getMinY()));
+			tvAFR.setText(String.valueOf(new DecimalFormat("##.#").format(AFRGraph._graphViewSeries.getMinY())));
 			
 			//tvBoost.setText(new DecimalFormat("#.##").format(zeitronixcomm.Boostv));	
 			tvBoost.setText(new DecimalFormat("#.##").format(BoostGraph._graphViewSeries.getMaxY()));

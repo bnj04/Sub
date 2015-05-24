@@ -36,7 +36,7 @@ public class MainActivity extends FragmentActivity
 	
 	private float pressedX;
 	private float pressedY;
-	Vector<Fragment> fragments;
+	public Vector<Fragment> fragments;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 
@@ -67,8 +67,16 @@ public class MainActivity extends FragmentActivity
 			@Override
 			public void onPageSelected(int arg0) 
 			{
-				Toast.makeText(MainActivity.this,
-						"Page Selected " + arg0, Toast.LENGTH_LONG).show();
+				String s;
+				if (arg0 == 1)
+				{
+					s = "ECU";
+				}
+				else
+				{
+					s="Zeitronix";
+				}
+				Toast.makeText(MainActivity.this, s + " page selected", Toast.LENGTH_LONG).show();
 			}
 
 			@Override
@@ -108,7 +116,13 @@ public class MainActivity extends FragmentActivity
 				        //Log.d(TAG, "x=" + pressedX + "-" + "y="+ pressedY);
 			        	saveknock();
 				        return true;
-			        }			      
+			        }		
+			        if (pressedY > 200)
+			        {
+				        //Log.d(TAG, "x=" + pressedX + "-" + "y="+ pressedY);
+			        	clearsavedknock();
+				        return true;
+			        }		
 			        break;
 			    }				
 				return false;
@@ -189,7 +203,7 @@ public class MainActivity extends FragmentActivity
 				if (!logFile.exists()) logFile.createNewFile();
 				BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true /*append*/));
 							
-				writer.write(ke.time + ";"+ke.type+";"+String.valueOf(new DecimalFormat("####").format(ke.rpm))+";"+String.valueOf(new DecimalFormat("#.##").format(ke.load))+";"+String.valueOf(new DecimalFormat("#.##").format(ke.value))+"\r\n");
+				writer.write(ke.time + ";"+ke.type+";"+String.valueOf(new DecimalFormat("####").format(ke.rpm))+";"+String.valueOf(new DecimalFormat("#.##").format(ke.load))+";"+String.valueOf(new DecimalFormat("#.##").format(ke.value))+";"+String.valueOf(new DecimalFormat("##.#").format(ke.afr))+"\r\n");
 				writer.close();
 				ke.time = null;
 			}
@@ -197,8 +211,17 @@ public class MainActivity extends FragmentActivity
 			{
 				Log.e(TAG, "Unable to write to the LogFile.");
 			}
+		}							
+	}
+	
+	public void clearsavedknock()
+	{
+		ECUActivity ecuact = (ECUActivity) fragments.get(1);		
+		KnockEvent ke = ecuact.ecucomm.getlastknockevent();
+		if (ke.time != null)
+		{		
+			ke.time = null;
+			Toast.makeText(MainActivity.this,"last knock event cleared...", Toast.LENGTH_LONG).show();
 		}
-		
-						
 	}
 }
