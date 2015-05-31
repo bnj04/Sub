@@ -5,9 +5,7 @@ import java.text.DecimalFormat;
 import com.alpinfra.subtunoid.comm.BTCommECU;
 import com.alpinfra.subtunoid.graph.Graph;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,15 +15,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
-public class ECUActivity extends android.support.v4.app.Fragment 
-{
-	Activity activity; 
+public class ECUActivity extends CustomActivity
+{	
 	//Log
-	private static final String TAG = "Subtunoid-ECU";
-
-	// Communication bluetooth	
-	public BTCommECU ecucomm;
-
+	String TAG = "Subtunoid-ECUActivity";
+	
 	// TextView
 	TextView tvIAT;
 	TextView tvLoad;
@@ -35,44 +29,22 @@ public class ECUActivity extends android.support.v4.app.Fragment
 	Graph LoadGraph;
 	Graph FBKCGraph;
 	Graph FLKCGraph;
-		
-		
-	public ECUActivity() 
-	{
-	}	
-	
-	@Override
-	public void onDetach() {
-		super.onDetach();
-	}
-	
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-	}
-	@Override
-	public void onDestroyView() {
-		super.onDestroyView();
-	}
-	
-  
-	
-
-	// Update GUI
-	final Handler myHandler = new Handler(); 
+					
+	// Update GUI	
 	final Runnable myRunnable = new Runnable() 
 	{
 		public void run() 
 		{						
-			tvIAT.setText(String.valueOf(ecucomm.IAT)+"°");					
-			tvLoad.setText(String.valueOf(new DecimalFormat("#.##").format(ecucomm.Load)));							
+			tvIAT.setText(String.valueOf(((BTCommECU)btComm).IAT)+"°");					
+			tvLoad.setText(String.valueOf(new DecimalFormat("#.##").format(((BTCommECU)btComm).Load)));							
 			tvKnock.setText(String.valueOf(new DecimalFormat("#.##").format(LoadGraph._graphViewSeries.getMaxY())));
 			
 			ViewPager myPager = (ViewPager) activity.findViewById(R.id.panelpager);
 			
-			if (LoadGraph.addData(ecucomm.Load)) myPager.setCurrentItem(1);
-			if (FBKCGraph.addData(-ecucomm.FBKC)) myPager.setCurrentItem(1);
-			if (FLKCGraph.addData(-ecucomm.FLKC)) myPager.setCurrentItem(1);																				
+			// change la page active en cas d'alarme
+			if (LoadGraph.addData(((BTCommECU)btComm).Load)) myPager.setCurrentItem(1);
+			if (FBKCGraph.addData(-((BTCommECU)btComm).FBKC)) myPager.setCurrentItem(1);
+			if (FLKCGraph.addData(-((BTCommECU)btComm).FLKC)) myPager.setCurrentItem(1);																				
 		}
 	};
 		
@@ -80,8 +52,8 @@ public class ECUActivity extends android.support.v4.app.Fragment
 	public void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);	
-		activity = getActivity();		
-		ecucomm = new BTCommECU(activity,myHandler,myRunnable);	
+		
+		btComm = new BTCommECU(activity,myHandler,myRunnable);	
 		
 		// Graph	    	   
 		LoadGraph = new Graph(activity, "Load", 0, 2.8, 2.45, 2.5);	   
@@ -90,21 +62,6 @@ public class ECUActivity extends android.support.v4.app.Fragment
 
 		Log.d(TAG, "...onCreate");
 	}
-
-	@Override
-	public void onResume() 
-	{
-		super.onResume();	    		
-		ecucomm.onResume();
-	}
-
-	@Override
-	public void onPause() 
-	{		
-		ecucomm.onPause();
-		super.onPause();	  	    	    	  
-	}
-	
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 

@@ -7,13 +7,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Vector;
-
 import com.alpinfra.subtunoid.comm.KnockEvent;
+import com.alpinfra.subtunoid.knocklistener.KnockListener;
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -37,29 +38,28 @@ public class MainActivity extends FragmentActivity
 	private float pressedX;
 	private float pressedY;
 	public Vector<Fragment> fragments;
-
+	
+	private KnockListener kl;
+		
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_main);						
 		
-		
-		fragments = new Vector<Fragment>();
-		
+		fragments = new Vector<Fragment>();		
 		ZeitronixActivity zeitronixactivity = new ZeitronixActivity();		
-		fragments.add(zeitronixactivity);
-		
+		fragments.add(zeitronixactivity);		
 		ECUActivity ecuactivity = new ECUActivity();			
 		fragments.add(ecuactivity);
 		
-		
-	
-
+		AudioManager audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+		audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 100, AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
+		kl = new KnockListener();
+				
 		ViewPager myPager = (ViewPager) findViewById(R.id.panelpager);
 		FragmentAdapter adapter = new FragmentAdapter(getSupportFragmentManager(), fragments);
-		myPager.setAdapter(adapter);
-		//myPager.setCurrentItem(1);
+		myPager.setAdapter(adapter);		
 
 		myPager.setOnPageChangeListener(new OnPageChangeListener() 
 		{
@@ -74,7 +74,7 @@ public class MainActivity extends FragmentActivity
 				}
 				else
 				{
-					s="Zeitronix";
+					s = "Zeitronix";
 				}
 				Toast.makeText(MainActivity.this, s + " page selected", Toast.LENGTH_LONG).show();
 			}
@@ -93,6 +93,7 @@ public class MainActivity extends FragmentActivity
 		
 		myPager.setOnTouchListener(new OnTouchListener() {
 			
+			@SuppressLint("ClickableViewAccessibility")
 			@Override
 			public boolean onTouch(View v, MotionEvent event) 
 			{
@@ -153,8 +154,7 @@ public class MainActivity extends FragmentActivity
 		{
 			Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			startActivityForResult(enableBtIntent, 1);
-		}
-		
+		}				
 	}
 
 	@Override
@@ -180,7 +180,23 @@ public class MainActivity extends FragmentActivity
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.action_settings) {
+		if (id == R.id.action_Quitter) 
+		{
+			finish();
+			return true;
+		}
+		if (id == R.id.action_KnockListener) 
+		{
+			// enable or disable knock listener
+			boolean b = kl.toogle();
+			if (b)
+			{
+				Toast.makeText(MainActivity.this,"Enabling Knock listening...", Toast.LENGTH_LONG).show();
+			}
+			else
+			{
+				Toast.makeText(MainActivity.this,"Disabling Knock listening...", Toast.LENGTH_LONG).show();
+			}
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -192,19 +208,24 @@ public class MainActivity extends FragmentActivity
 		Log.d(TAG, "Saving knock event...");
 		ECUActivity ecuact = (ECUActivity) fragments.get(1);
 		
-		KnockEvent ke = ecuact.ecucomm.getlastknockevent();
+		KnockEvent ke = ecuact.btComm.getlastknockevent();
 		
 		if (ke.time != null)
 		{
 			Toast.makeText(MainActivity.this,"Saving knock event...", Toast.LENGTH_LONG).show();
 			try
-			{
-				File logFile = new File(((Context)this).getExternalFilesDir(null), "sublog.txt");
-				if (!logFile.exists()) logFile.createNewFile();
-				BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true /*append*/));
-							
+			{							
+				File logFile = new File("/storage/extSdCard/subtunoid/log.txt");												
+				if (!logFile.exists())
+				{
+					logFile.createNewFile();
+					logFile.setWritable(true, false);
+				}
+				FileWriter fw = new FileWriter(logFile, true);
+				BufferedWriter writer = new BufferedWriter(fw);							
 				writer.write(ke.time + ";"+ke.type+";"+String.valueOf(new DecimalFormat("####").format(ke.rpm))+";"+String.valueOf(new DecimalFormat("#.##").format(ke.load))+";"+String.valueOf(new DecimalFormat("#.##").format(ke.value))+";"+String.valueOf(new DecimalFormat("##.#").format(ke.afr))+"\r\n");
 				writer.close();
+				fw.close();					
 				ke.time = null;
 			}
 			catch (IOException e)
@@ -217,11 +238,14 @@ public class MainActivity extends FragmentActivity
 	public void clearsavedknock()
 	{
 		ECUActivity ecuact = (ECUActivity) fragments.get(1);		
-		KnockEvent ke = ecuact.ecucomm.getlastknockevent();
+		KnockEvent ke = ecuact.btComm.getlastknockevent();
 		if (ke.time != null)
 		{		
 			ke.time = null;
 			Toast.makeText(MainActivity.this,"last knock event cleared...", Toast.LENGTH_LONG).show();
 		}
 	}
+	
+	
+	
 }

@@ -4,9 +4,7 @@ import java.text.DecimalFormat;
 
 import com.alpinfra.subtunoid.comm.BTCommZeitronix;
 import com.alpinfra.subtunoid.graph.Graph;
-import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,17 +14,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
-public class ZeitronixActivity extends android.support.v4.app.Fragment 
-{
-	Activity activity; 
-	
+public class ZeitronixActivity extends CustomActivity 
+{	
 	// Log
-	private static final String TAG = "Subtunoid-Zeitronix";
-
-	// Communication bluetooth
-	public BTCommZeitronix zeitronixcomm;
+	private static final String TAG = "Subtunoid-ZeitronixActivity";
 	
-
 	// TextView
 	TextView tvEGT;
 	TextView tvAFR;
@@ -37,12 +29,8 @@ public class ZeitronixActivity extends android.support.v4.app.Fragment
 	Graph AFRGraph;
 	Graph BoostGraph;
 	
-	public ZeitronixActivity() 
-	{
-	}
+	
 
-	// Update GUI
-	final Handler myHandler = new Handler(); 
 	final Runnable myRunnable = new Runnable() 
 	{
 		public void run() 
@@ -58,9 +46,9 @@ public class ZeitronixActivity extends android.support.v4.app.Fragment
 							
 			ViewPager myPager = (ViewPager) activity.findViewById(R.id.panelpager);		
 			
-			if (EGTGraph.addData(zeitronixcomm.EGTv)) myPager.setCurrentItem(0);	       
-			if (AFRGraph.addData(zeitronixcomm.AFRv)) myPager.setCurrentItem(0);
-			if (BoostGraph.addData(zeitronixcomm.Boostv)) myPager.setCurrentItem(0);	
+			if (EGTGraph.addData(((BTCommZeitronix)btComm).EGTv)) myPager.setCurrentItem(0);	       
+			if (AFRGraph.addData(((BTCommZeitronix)btComm).AFRv)) myPager.setCurrentItem(0);
+			if (BoostGraph.addData(((BTCommZeitronix)btComm).Boostv)) myPager.setCurrentItem(0);	
 			
 				
 			
@@ -72,11 +60,11 @@ public class ZeitronixActivity extends android.support.v4.app.Fragment
 	public void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
-		activity = getActivity();
+		//activity = getActivity();
 		//setContentView(R.layout.activity_main);
 		 
 		// Communication
-		zeitronixcomm = new BTCommZeitronix(activity,myHandler,myRunnable);
+		btComm = new BTCommZeitronix(activity,myHandler,myRunnable);
 
 		// Graph	    	   
 		EGTGraph = new Graph(activity, "EGT", 200, 900, 800, 850);	   
@@ -86,21 +74,7 @@ public class ZeitronixActivity extends android.support.v4.app.Fragment
 		Log.d(TAG, "...onCreate");
 	}
 
-	@Override
-	public void onResume() 
-	{
-		super.onResume();	    		
-		zeitronixcomm.onResume();
-	}
-
-	@Override
-	public void onPause() 
-	{		
-		zeitronixcomm.onPause();
-		super.onPause();	  	    	    	  
-	}
-
-		
+			
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 	{

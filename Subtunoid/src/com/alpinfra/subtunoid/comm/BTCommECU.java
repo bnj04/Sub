@@ -2,60 +2,25 @@ package com.alpinfra.subtunoid.comm;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Timer;
 import java.util.TimerTask;
-import java.util.UUID;
-
 import com.alpinfra.subtunoid.MainActivity;
 import com.alpinfra.subtunoid.ZeitronixActivity;
-
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.Context;
-//import android.content.Intent;
-import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
 
 
-public class BTCommECU extends Activity 
+public class BTCommECU extends CustomBTComm
 {
 	private static final String TAG = "Subtunoid-BTCommECU";
-	// SPP UUID service
-	private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-	
+		
 	// MAC-address of Bluetooth module for ECU		
 	public static String addressBTECU = "00:01:95:16:A4:B7";
-	
-	
-	private Context _context;
-	private Handler _myHandler;	  		  		 
-	private Runnable _myRunnable;
-	
-	
-	private KnockEvent ke;
-	private SimpleDateFormat sdf;
-	
-	// BT
-	private BluetoothAdapter btAdapter = null;
-	private BluetoothSocket btSocket = null;
-	
-	private OutputStream outStream = null;
-	private InputStream inStream = null;	
-	private Timer timerserial;
-	private TimerTask tt;
-	
-	
+	public static int rate = 150; 
+		
 	public double RPM;
 	public double IAT;
 	public double Load;
@@ -66,23 +31,10 @@ public class BTCommECU extends Activity
 	public double PreviousFLKC;
 	public double PreviousFBKC;
 	
-	@SuppressLint("SimpleDateFormat")
 	public BTCommECU(Context context, Handler myHandler, Runnable myRunnable)
-	{
-		ke = new KnockEvent();
-		sdf = new SimpleDateFormat("yyyyMMdd;HH:mm:ss");
-		
-		
-		_context = context;
-		_myHandler = myHandler;
-		_myRunnable = myRunnable;
-		
-		// BT
-		btAdapter = BluetoothAdapter.getDefaultAdapter();
-		//checkBTState();
-		
-		timerserial = new Timer(); 
-		
+	{	
+		super(addressBTECU, rate, context, myHandler, myRunnable);
+		Log.d(TAG, "...onCreation...");
 		tt = new TimerTask() 
 		{			
 			@Override
@@ -94,17 +46,11 @@ public class BTCommECU extends Activity
 				
 				sendData();
 				
-				ma = (MainActivity) _context;
-				zeintronixact = (ZeitronixActivity) ma.fragments.get(0);
-			    ke.afr = zeintronixact.zeitronixcomm.AFRv;
-														
+																	
 				List<Integer> b = readdata(inStream); 				
 				if (b != null)
 				{
-					// debug
-					
-					
-					
+					// debug													
 					RPM = (b.get(6) + b.get(5) * 0xff) / 4 ;
 					IAT = b.get(7) - 40;					
 					Load = (b.get(9) + b.get(8) * 0xff) * .00006103515625;				    				  
@@ -135,7 +81,7 @@ public class BTCommECU extends Activity
 				    	ke.load = Load;
 				    	ma = (MainActivity) _context;
 				    	zeintronixact = (ZeitronixActivity) ma.fragments.get(0);
-				    	ke.afr = zeintronixact.zeitronixcomm.AFRv;
+				    	ke.afr = ((BTCommZeitronix)zeintronixact.btComm).AFRv;
 				    }
 				    
 				    // /!\ FLTO
@@ -148,7 +94,7 @@ public class BTCommECU extends Activity
 				    	ke.load = Load;		
 				    	ma = (MainActivity) _context;
 				    	zeintronixact = (ZeitronixActivity) ma.fragments.get(0);
-				    	ke.afr = zeintronixact.zeitronixcomm.AFRv;
+				    	ke.afr = ((BTCommZeitronix)zeintronixact.btComm).AFRv;
 				    }				    				  				 
 				}
 				else
@@ -161,154 +107,7 @@ public class BTCommECU extends Activity
 		};			
 	}
 
-	
-	public void onResume()
-	{
-
-	    Log.d(TAG, "...onResumeECU - try connect...");
-	    
-	    //checkBTState();
-	    
-	    // Set up a pointer to the remote node using it's address.
-	    BluetoothDevice device = btAdapter.getRemoteDevice(addressBTECU);
-	    
-	    // Two things are needed to make a connection:
-	    //   A MAC address, which we got above.
-	    //   A Service ID or UUID.  In this case we are using the
-	    //     UUID for SPP.
-	    
-	    try 
-	    {
-	        btSocket = createBluetoothSocket(device);
-	    } 
-	    catch (IOException e1) 
-	    {
-	        errorExit("Fatal Error", "In onResume() and socket create failed: " + e1.getMessage() + ".");
-	    }
-	        
-	    // Discovery is resource intensive.  Make sure it isn't going on
-	    // when you attempt to connect and pass your message.
-	    btAdapter.cancelDiscovery();
-	    
-	    // Establish the connection.  This will block until it connects.
-	    Log.d(TAG, "...ConnectingECU...");
-	    try 
-	    {
-	      btSocket.connect();
-	      Log.d(TAG, "...ConnectionECU ok...");
-	      
-	      // Create a data stream so we can talk to server.
-		    Log.d(TAG, "...Create SocketECU...");
-		  
-		    try 
-		    {
-		      outStream = btSocket.getOutputStream();
-		      inStream = btSocket.getInputStream();
-		      Log.d(TAG, "...lancement du timerECU...");
-		      timerserial.scheduleAtFixedRate(tt, 100, 150);
-		      //timerserial.schedule(tt, 0);
-		      //tt.run();
-		    } 
-		    catch (IOException e) 
-		    {
-		      errorExit("Fatal Error", "In onResume() and output stream creation failed:" + e.getMessage() + ".");
-		    }
-		    
-	      
-	      
-	    } 
-	    catch (IOException e) 
-	    {
-	      try 
-	      {
-	        btSocket.close();
-	        Log.d(TAG, "...ConnectionECU closed...");
-	        errorExit("Subtunoid", "Unable to connectECU");
-	      } 
-	      catch (IOException e2) 
-	      {	    	  
-	        errorExit("Fatal Error ECU", "In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
-	      }
-	    }	      	   	    	 
-	}
-	
-	public void onPause()
-	{
-		timerserial.purge();
-	    timerserial.cancel();
-	    Log.d(TAG, "...In onPauseECU()...");
-	  
-	    if (outStream != null) {
-	      try {
-	        outStream.flush();
-	      } catch (IOException e) {
-	        errorExit("Fatal Error", "In onPauseECU() and failed to flush output stream: " + e.getMessage() + ".");
-	      }
-	    }
-	  
-	    try     {
-	      btSocket.close();
-	    } catch (IOException e2) {
-	      errorExit("Fatal Error", "In onPauseECU() and failed to close socket." + e2.getMessage() + ".");
-	    }
-	    
-	}
-	
-	/*private void checkBTState() 
-	{
-		// Check for Bluetooth support and then check to make sure it is turned on
-		// Emulator doesn't support Bluetooth and will return null
-		if(btAdapter==null) 
-		{		      			
-			Toast.makeText(_context, "Fatal Error" + " - " + "Bluetooth not supported", Toast.LENGTH_LONG).show();
-		    finish();
-		} 
-		else 
-		{
-			if (btAdapter.isEnabled()) 
-			{
-				Log.d(TAG, "...Bluetooth ON...");
-			} 
-			else 
-			{
-				//Prompt user to turn on Bluetooth
-				Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-				_context.startActivity(enableBtIntent);
-				//startActivityForResult(enableBtIntent, 1);
-			}
-		}
-	}*/
-	
-	private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException 
-	  {
-	      if(Build.VERSION.SDK_INT >= 10)
-	      {
-	          try 
-	          {
-	              final Method  m = device.getClass().getMethod("createInsecureRfcommSocketToServiceRecord", new Class[] { UUID.class });
-	              return (BluetoothSocket) m.invoke(device, MY_UUID);
-	          } catch (Exception e) 
-	          {
-	              Log.e(TAG, "Could not create Insecure RFComm Connection",e);
-	          }
-	      }
-	      return  device.createRfcommSocketToServiceRecord(MY_UUID);
-	  }
-	
-	private void errorExit(String title, String message)
-	 {
-		    Toast.makeText(_context, title + " - " + message, Toast.LENGTH_LONG).show();
-		    finish();
-	 }	
-	
-	public KnockEvent getlastknockevent()
-	{
-		
-		return ke;
-		
-	}
-	
-	public void sendData() 
+	private void sendData() 
 	{
 	    try 
 	    {	    		    
@@ -464,9 +263,7 @@ public class BTCommECU extends Activity
 		return buffer;		  
 	}
 	
-
-	
-	int calculcrc(List<Integer> data)
+	private int calculcrc(List<Integer> data)
 	{
 		int t = 0;
 		if (data.size()>4)

@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">Subtunoid</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_KnockListener">Knock</string>
+    <string name="action_Quitter">Quitter</string>
 
 </resources>
